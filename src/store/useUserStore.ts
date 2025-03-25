@@ -32,6 +32,7 @@ type UserStore = {
 };
 // storing
 export const useUserStore = create<UserStore>((set) => ({
+  user_id: 1,
   username: "",
   role: "",
   isLoggedIn: false,
