@@ -13,7 +13,6 @@ export default function FileUpload() {
   const [loading, setLoading] = useState(false);
   const [songName, setSongName] = useState<string>("");
   const [artistName, setArtistName] = useState<string>("");
-  //const [currUser, setCurrUser] = useState<string>("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target as HTMLInputElement;
@@ -48,28 +47,47 @@ export default function FileUpload() {
     setStatusMessage("Uploading file...");
     setLoading(true);
 
-    console.log("Uploading file:", file);
+    try {
+      const checksum = await computeSHA256(file);
+      const urlresult = await getSignedURL(file.type, file.size, checksum);
+      if (urlresult.failure !== undefined) {
+        setStatusMessage("Failed to get upload URL!");
+        setLoading(false);
+        throw new Error(urlresult.failure);
+      }
+      const uploadUrl = urlresult.success.url;
 
-    if (!file) return;
-    const checksum = await computeSHA256(file);
-    const urlresult = await getSignedURL(file.type, file.size, checksum);
-    if (urlresult.failure !== undefined) {
-      setStatusMessage("Failed to upload file!");
+      // Upload the file
+      await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+
+      setStatusMessage("File uploaded! Creating song...");
+      
+      // Call your create song API endpoint to create a new song record
+      const createSongResponse = await fetch("/api/createSong", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: songName,
+          artist: artistName,
+          filePath: uploadUrl, // Assuming the file URL is the uploadUrl
+        }),
+      });
+
+      if (!createSongResponse.ok) {
+        setStatusMessage("Song creation failed!");
+      } else {
+        setStatusMessage("Song uploaded and created successfully!");
+      }
+    } catch (error) {
+      console.error("Error uploading song:", error);
+      setStatusMessage("An error occurred during upload.");
+    } finally {
       setLoading(false);
-      throw new Error(urlresult.failure);
     }
-    const url = urlresult.success.url;
-
-    await fetch(url, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-Type": file.type,
-      },
-    });
-
-    setStatusMessage("File uploaded!");
-    setLoading(false);
   };
 
   return (
