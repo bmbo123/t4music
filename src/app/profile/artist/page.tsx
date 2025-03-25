@@ -8,13 +8,15 @@ import ArtistAlbums from '../components/Artist/ArtistAlbums';
 import TopTracks from '../components/Artist/TopTracks';
 import ArtistBio from '../components/Artist/ArtistBio';
 import ArtistActions from '../components/Artist/ArtistActions';
+import { useUserStore } from "@/store/useUserStore";
 
 export default function ArtistProfilePage() {
+  const { username } = useUserStore(); 
   return (
     <div className="min-h-screen bg-black text-white overflow-visible">
       <NavBar role="artist" />
       {/* Full-width hero banner at the top */}
-      <ArtistCard />
+      <ArtistCard artistName={username} />
       {/* Main content container below the banner */}
       <div className="max-w-6xl mx-auto px-6 py-10 space-y-12">
         <ArtistBio />

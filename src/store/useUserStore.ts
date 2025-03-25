@@ -1,3 +1,4 @@
+import internal from "stream";
 import { create } from "zustand";
 // here i am importing all necessary data (i think mostly everything) from the db for zustand to use for data retrieval.
 type Song = {
@@ -16,6 +17,7 @@ type Playlist = {
 };
 
 type UserStore = {
+  user_id: number;
   username: string;
   role: string;
   isLoggedIn: boolean;

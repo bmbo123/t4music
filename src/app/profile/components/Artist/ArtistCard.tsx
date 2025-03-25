@@ -1,10 +1,11 @@
 "use client";
 import Image from "next/image";
-import { useUserStore } from "@/app/store/userStore"; 
 
-export default function ArtistCard() {
-  const { username } = useUserStore(); // Retrieve artist name from store
+interface ArtistCardProps {
+  artistName: string | null;
+}
 
+export default function ArtistCard({ artistName }: ArtistCardProps) {
   return (
     <div className="relative w-full bg-black">
       <div className="p-8">
@@ -21,17 +22,12 @@ export default function ArtistCard() {
 
           {/* Artist Info */}
           <div className="flex flex-col">
-            {/* Label above the artist name */}
             <span className="text-white text-sm uppercase tracking-wide mb-1">
               Artist
             </span>
-
-            {/* Artist Name (larger text) */}
             <h2 className="text-5xl font-extrabold text-white leading-none">
-              {username || "Artist Name"}
+              {artistName || "Artist Name"}
             </h2>
-
-            {/* Basic stats (customize as needed) */}
             <p className="text-white text-sm mt-2">
               1.2M Followers • Indie Genre
             </p>
