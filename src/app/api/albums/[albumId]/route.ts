@@ -7,28 +7,25 @@ export async function POST(
   { params }: { params: { albumId: string } }
 ) {
   try {
-    // Extract user_id from the request body along with other data.
-    const { title, Album_id, user_id, ...songData } = await request.json();
+    // Parse the request body
+    const { title, Album_id, ...songData } = await request.json();
 
-    // If user_id is missing, return an error response.
-    if (!user_id) {
-      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
-    }
+    // For development only: use a default user id
+    const user_id = 1; // This bypasses any API password or authentication
 
-    // Create the song using the provided user_id
     const song = await prisma.songs.create({
       data: {
         title,
         Album_id,
-        duration: 180, // set default or get from songData
-        file_path: "/public/music/Hotel-Room-Service.mp3", // placeholder or from songData
+        duration: 180, // default duration
+        file_path: "/public/music/Hotel-Room-Service.mp3", // placeholder file path
         file_format: "mp3",
-        user_id, // now using the passed-in user_id
+        user_id, // using the hardcoded user id
         ...songData,
       },
     });
 
-    // Optionally create a relation in album_songs if needed:
+    // Create the album_songs relationship
     await prisma.album_songs.create({
       data: {
         Album_id: parseInt(params.albumId, 10),
