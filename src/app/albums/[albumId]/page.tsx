@@ -4,16 +4,22 @@ import { useRouter, useParams } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
 
 interface Params {
-  albumId: string;
+  albumId?: string; // albumId may be undefined initially
 }
 
 export default function AlbumDetail() {
   const [songTitle, setSongTitle] = useState("");
   const router = useRouter();
-  const { albumId } = useParams() as Params; // cast to our Params interface
+  const params = useParams() as Params;
+  const albumId = params.albumId;
 
   // Retrieve the authenticated user's id from the store
   const { user_id } = useUserStore();
+
+  // If albumId isn't available yet, return a loading state
+  if (!albumId) {
+    return <div className="min-h-screen bg-black text-white p-4">Loading album...</div>;
+  }
 
   const handleAddSong = async (e: React.FormEvent) => {
     e.preventDefault();
