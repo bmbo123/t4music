@@ -24,8 +24,8 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
 
   return (
     <nav className="bg-black text-white px-5 py-2 shadow-md">
-    <div className="w-full flex items-center justify-between px-4">
-      {/* Left Section: Home Icon */}
+      <div className="w-full flex items-center justify-between px-4">
+        {/* Left Section: Home Icon */}
         <div className="flex items-center">
           <Link href="/home" className="hover:text-gray-300">
             <FaHome size={24} />
