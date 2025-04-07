@@ -12,13 +12,13 @@ import { useUserStore } from "@/store/useUserStore";
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
+console.log(classNames)// can delete later
 interface NavBarProps {
   role?: "listener" | "artist" | "admin";
 }
 
 export default function NavBar({ role = "listener" }: NavBarProps) {
   const router = useRouter();
-  const { role, logout } = useUserStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<{ username: string; user_id: number; pfp?: string }[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -69,6 +69,10 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
     { id: 2, message: "Your album 'Chill Vibes' was liked" },
     { id: 3, message: "New artist trending near you" },
   ];
+
+  function logout() {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <nav className="bg-black text-white px-5 py-2 shadow-md">

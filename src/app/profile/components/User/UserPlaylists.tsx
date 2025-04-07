@@ -29,7 +29,8 @@ export default function UserPlaylists() {
   }, [username, isLoggedIn]);
 
   const handleCreatePlaylist = async (name: string, playlist_art: string) => {
-    const newPlaylist = await createPlaylist(name, user_id, playlist_art);
+    if(user_id !== null){
+      const newPlaylist = await createPlaylist(name, user_id, playlist_art);
     setPlaylists([...playlists, newPlaylist]);
     }
   };
