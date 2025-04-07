@@ -1,34 +1,30 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { use } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 import AddSongModal from "@/app/profile/components/User/AddSongModal";
 import Image from "next/image";
 
-import { useParams } from "next/navigation";
-
-// Types
-interface Song {
+type Song = {
   song_id: number;
   title: string;
   genre?: string;
   file_path: string;
-}
+};
 
-interface Playlist {
+type Playlist = {
   playlist_id: number;
   name: string;
   playlist_art?: string;
   playlist_songs: {
     songs: Song;
   }[];
-}
+};
 
-export default function PlaylistPage() {
+export default function PlaylistPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const params = useParams();
-  const id = params?.id as string;
-
+  const { id } = use(params);
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -41,9 +37,14 @@ export default function PlaylistPage() {
   };
 
   useEffect(() => {
-    if (id) fetchPlaylist();
+    const fetchPlaylist = async () => {
+      const res = await fetch(`/api/playlists/${id}`);
+      const data = await res.json();
+      setPlaylist(data);
+    };
+    fetchPlaylist();
   }, [id]);
-
+  
   const handlePlay = (filePath: string) => {
     const url = `/${filePath}`;
     setCurrentTrack(url);
@@ -61,7 +62,7 @@ export default function PlaylistPage() {
 
     const result = await res.json();
     if (!res.ok) return alert(result.error || "Failed to remove song");
-    alert("\u274C Song removed");
+    alert("❌ Song removed");
     fetchPlaylist();
   };
 
@@ -86,13 +87,13 @@ export default function PlaylistPage() {
       </button>
 
       <div className="flex gap-6 items-center">
-        <Image
-          src={playlist.playlist_art || "/artist-banner.jpg"}
-          alt="Cover"
-          width={160}
-          height={160}
-          className="w-40 h-40 object-cover rounded shadow-lg"
-        />
+      <Image
+        src={playlist.playlist_art || "/artist-banner.jpg"}
+        alt="Cover"
+        width={160}
+        height={160}
+        className="w-40 h-40 object-cover rounded shadow-lg"
+      />
         <div>
           <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 text-transparent bg-clip-text">
             {playlist.name}
@@ -111,8 +112,9 @@ export default function PlaylistPage() {
         {playlist.playlist_songs.length === 0 ? (
           <p className="text-gray-500">No songs yet. Add some!</p>
         ) : (
-          playlist.playlist_songs.map((entry, i) => {
+          playlist.playlist_songs.map((entry: { songs: Song }, i) => {
             const song = entry.songs;
+            const filePath = song.file_path;
             return (
               <div
                 key={song.song_id}
@@ -126,7 +128,7 @@ export default function PlaylistPage() {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handlePlay(song.file_path)}
+                    onClick={() => handlePlay(filePath)}
                     className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full hover:scale-105 text-sm shadow"
                   >
                     ▶️ Play
@@ -148,7 +150,7 @@ export default function PlaylistPage() {
         <audio ref={audioRef} src={currentTrack} controls autoPlay className="mt-6 w-full" />
       )}
 
-      {showModal && playlist && (
+      {showModal && (
         <AddSongModal
           onClose={() => setShowModal(false)}
           onAdd={fetchPlaylist}

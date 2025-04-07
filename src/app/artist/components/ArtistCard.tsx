@@ -3,27 +3,14 @@ import { useState } from "react";
 import Image from "next/image";
 import { useUserStore } from "@/store/useUserStore";
 
-export type Artist = {
+type Artist = {
   user_id: number;
   username: string;
   pfp?: string;
-  followers: number;
-  isFollowing: boolean;
-  bio?: string;
-  songs: {
-    song_id: number;
-    title: string;
-    file_path: string;
-    album?: {
-      album_art?: string;
-    };
-  }[];
-  album: {
-    album_id: number;
-    title: string;
-    album_art?: string;
-  }[];
-  playlists?: string[];
+  followers?: number;
+  isFollowing?: boolean;
+  songs?: { song_id: number }[];
+  playlists?: { playlist_id: number }[];
 };
 
 export default function ArtistCard({ artist }: { artist: Artist }) {

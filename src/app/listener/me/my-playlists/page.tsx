@@ -16,7 +16,7 @@ export default function MyPlaylistsPage() {
       <Sidebar username={username} />
 
       <div className="flex flex-col flex-1 min-w-0">
-        <NavBar />
+        <NavBar role="listener" />
 
         <main className="p-6 overflow-auto">
           <div className="bg-gradient-to-br from-pink-500 via-blue-400 to-purple-600 p-6 rounded-lg shadow-md mb-8">

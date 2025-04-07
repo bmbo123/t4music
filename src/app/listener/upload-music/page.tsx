@@ -72,7 +72,7 @@ export default function UploadMusicPage() {
       <Sidebar username={username} />
       
       <div className="flex flex-col flex-1 min-w-0">
-        <NavBar />
+        <NavBar role="listener" />
 
         <main className="p-6 overflow-auto">
           <div className="bg-gray-900 rounded-lg p-6 max-w-2xl mx-auto">

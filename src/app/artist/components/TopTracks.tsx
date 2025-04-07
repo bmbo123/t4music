@@ -2,27 +2,39 @@
 
 import Image from "next/image";
 import { usePlayerStore } from "@/store/useUserStore";
-import type { Song } from "@/store/useUserStore";
 
-export default function TopTracks({ tracks }: { tracks: Song[] }) {
+interface Track {
+  song_id: number;
+  title: string;
+  file_path: string;
+  users?: {
+    username: string;
+  };
+  album?: {
+    title?: string;
+    album_art?: string;
+  };
+}
+
+export default function TopTracks({ tracks }: { tracks: Track[] }) {
   const { currentSong, isPlaying, setSong, togglePlay } = usePlayerStore();
 
-  const handlePlay = (track: Song) => {
+  const handlePlay = (track: Track) => {
     const isCurrent = currentSong?.song_id === track.song_id;
     if (isCurrent) {
       togglePlay();
       return;
     }
 
-    const fallbackAlbum: NonNullable<Song["album"]> = {
-      title: "Unknown Album",
-      album_art: "/albumArt/defaultAlbumArt.png",
-    };
-
     setSong({
-      ...track,
-      users: track.users ?? { username: "Unknown Artist" },
-      album: track.album ?? fallbackAlbum,
+      song_id: track.song_id,
+      title: track.title,
+      file_path: track.file_path,
+      users: track.users || { username: "Unknown Artist" },
+      album: track.album || {
+        title: "Unknown Album",
+        album_art: "/albumArt/defaultAlbumArt.png",
+      },
     });
   };
 
@@ -46,9 +58,7 @@ export default function TopTracks({ tracks }: { tracks: Song[] }) {
               />
               <div className="flex flex-col">
                 <span className="font-medium text-lg text-white">{track.title}</span>
-                <span className="text-gray-400 text-sm">
-                  {track.users?.username || "Unknown Artist"}
-                </span>
+                <span className="text-gray-400 text-sm">{track.users?.username || "Unknown Artist"}</span>
               </div>
             </div>
 

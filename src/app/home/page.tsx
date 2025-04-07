@@ -1,10 +1,11 @@
-import { Suspense } from "react";
+"use client";
 import ListenerHome from "@/components/ui/home";
 
 export default function HomePage() {
   return (
-    <Suspense fallback={<div className="text-white p-6">Loading home...</div>}>
+    <div>
       <ListenerHome />
-    </Suspense>
+    </div>
   );
 }
+// this was very wrong so i fixed my mistakes LOL

@@ -37,21 +37,53 @@ const PlayBar = ({ currentSong, isPlaying, progress, onPlayPause, onSeek }: Play
     <div className="fixed bottom-0 left-0 right-0 bg-gray-900/80 border-t border-gray-700/50 p-4 z-50">
       <div className="max-w-7xl mx-auto flex items-center gap-4">
         {currentSong?.album?.album_art && (
+<<<<<<< HEAD
           <img
+=======
+          <Image
+>>>>>>> parent of d342f95 (YESSSSSSSSSSSSSSSSSSSS IT WORKED)
             src={currentSong.album.album_art}
-            alt={currentSong.album.title || "Album Art"}
+            className="w-16 h-16 rounded-md"
+            alt={currentSong.album.title}
             width={64}
             height={64}
+<<<<<<< HEAD
+=======
+            unoptimized
+>>>>>>> parent of d342f95 (YESSSSSSSSSSSSSSSSSSSS IT WORKED)
           />
         )}
+
         <div className="flex-1 min-w-0">
+<<<<<<< HEAD
           <h3 className="text-white font-medium truncate">{currentSong?.title}</h3>
           <p className="text-gray-400 text-sm truncate">{currentSong?.users?.username || "Unknown artist"}</p>
+=======
+          <h3 className="text-white font-medium truncate">{currentSong.title}</h3>
+          <p className="text-gray-400 text-sm truncate">
+            {currentSong.users?.username || "Unknown artist"}
+          </p>
+>>>>>>> parent of d342f95 (YESSSSSSSSSSSSSSSSSSSS IT WORKED)
         </div>
+
         <div className="flex items-center gap-4">
+<<<<<<< HEAD
           <button onClick={onPlayPause} className="text-3xl text-white">
             {isPlaying ? (
               <FiPauseCircle className="text-white" />
+=======
+          <button onClick={togglePlay} className="text-3xl text-white">
+            {isPlaying ? <FiPauseCircle /> : <FiPlayCircle />}
+          </button>
+
+          <button
+            onClick={handleLike}
+            className="text-xl hover:scale-110 transition-transform"
+            title={isLiked ? "Unlike" : "Like"}
+          >
+            {isLiked ? (
+              <FaHeart className="text-pink-500" />
+>>>>>>> parent of d342f95 (YESSSSSSSSSSSSSSSSSSSS IT WORKED)
             ) : (
               <FiPlayCircle className="text-white" />
             )}
@@ -63,7 +95,11 @@ const PlayBar = ({ currentSong, isPlaying, progress, onPlayPause, onSeek }: Play
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="max-w-7xl mx-auto mt-2 cursor-pointer" onClick={onSeek}>
+=======
+      <div className="max-w-7xl mx-auto mt-2 cursor-pointer">
+>>>>>>> parent of d342f95 (YESSSSSSSSSSSSSSSSSSSS IT WORKED)
         <div className="h-1 bg-gray-700 rounded-full w-full">
           <div
             className="h-full bg-gradient-to-r from-pink-300 via-blue-400 to-purple-500 rounded-full transition-all duration-300"

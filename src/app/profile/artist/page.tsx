@@ -37,7 +37,7 @@ export default function ArtistProfilePage() {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-visible">
-      <NavBar/>
+      <NavBar role="artist" />
       <ArtistCard albumCount={albumCount} songCount={songCount} />
       <div className="max-w-6xl mx-auto px-6 py-10 space-y-12">
         <ArtistBio />

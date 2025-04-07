@@ -4,22 +4,17 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useUserStore, usePlayerStore } from "@/store/useUserStore";
 
+
 interface Song {
   song_id: number;
   title: string;
   file_path: string;
   duration: number;
   plays_count: number;
-  users?: {
-    username: string;
-    pfp?: string;
-  };
   album?: {
-    title?: string;
     album_art?: string;
   };
 }
-
 
 export default function TopTracks() {
   const { user_id, username, isLoggedIn } = useUserStore();

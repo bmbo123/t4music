@@ -5,14 +5,14 @@ import Sidebar from "@/components/ui/Sidebar";
 import { useUserStore } from "@/store/useUserStore";
 
 export default function LikedSongsPage() {
-  const { likedSongs, username } = useUserStore();
+  const { likedSongs, username, role } = useUserStore();
 
   return (
     <div className="flex min-h-screen bg-black text-white">
       <Sidebar username={username} />
 
       <div className="flex flex-col flex-1 min-w-0">
-        <NavBar />
+        <NavBar role={(role || "listener") as "listener" | "artist" | "admin"} />
 
         <main className="p-6 overflow-auto">
           <div className="bg-gradient-to-br from-pink-500 via-blue-400 to-purple-600 p-6 rounded-lg shadow-md mb-8">

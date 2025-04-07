@@ -10,35 +10,28 @@ export default function CreateAlbumPage() {
 
   const [title, setTitle] = useState("");
   const [albumArt, setAlbumArt] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!title.trim()) return alert("Album title is required");
 
-    setLoading(true);
-    try {
-      const res = await fetch("/api/albums/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          album_art: albumArt || undefined,
-          user_id,
-        }),
-      });
+    const res = await fetch("/api/albums/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        album_art: albumArt,
+        user_id,
+      }),
+    });
 
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.error || "Failed to create album");
-      } else {
-        router.push(`/albums/${data.album_id}`);
-      }
-    } catch (err) {
-      console.error("Error creating album:", err);
-      alert("Something went wrong while creating the album.");
-    } finally {
-      setLoading(false);
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Failed to create album");
+    } else {
+      router.push(`/albums/${data.album_id}`);
     }
   };
 
@@ -75,10 +68,9 @@ export default function CreateAlbumPage() {
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:opacity-90 text-white font-semibold py-2 rounded-md transition-all"
+          className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:opacity-90 text-white font-semibold py-2 rounded-md"
         >
-          {loading ? "Creating..." : "➕ Create Album"}
+          ➕ Create Album
         </button>
       </form>
     </div>

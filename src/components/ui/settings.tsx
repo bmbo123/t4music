@@ -10,7 +10,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavBar />
+      <NavBar role="listener" />
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-4xl font-bold mb-8">Settings</h1>
 

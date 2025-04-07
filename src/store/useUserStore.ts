@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type Song = {
+type Song = {
   song_id: number;
   title: string;
   genre?: string;
@@ -14,7 +14,7 @@ export type Song = {
     pfp?: string;
   };
   album?: {
-    title?: string;
+    title: string;
     album_art?: string;
   };
 };
