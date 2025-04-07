@@ -41,19 +41,25 @@ type FollowedArtist = {
 };
 
 type UserStore = {
-  user_id: number;
+  user_id: number | null;
   username: string;
   role: string;
   pfp?: string;
   followers: number;
   following: number;
+  followingList: number[];
   playlistCount: number;
   isLoggedIn: boolean;
   likedSongs: Song[];
   playlists: Playlist[];
   streamingHistory: Song[];
   followedArtists: FollowedArtist[];
-  setUser: (user_id: number, username: string, role: string, pfp?: string) => void;
+  topTracks: Song[];
+
+  // Actions
+  setUser: (username: string, role: string, pfp?: string, user_id?: number | null) => void;
+  setuser_id: (id: number) => void;
+  setPfp: (pfp: string) => void;
   setLikedSongs: (songs: Song[]) => void;
   setPlaylists: (lists: Playlist[]) => void;
   setStreamingHistory: (songs: Song[]) => void;
@@ -61,9 +67,10 @@ type UserStore = {
   setFollowing: (count: number) => void;
   setPlaylistCount: (count: number) => void;
   setFollowedArtists: (artists: FollowedArtist[]) => void;
+  setFollowingList: (ids: number[]) => void;
+  setTopTracks: (songs: Song[]) => void;
   logout: () => void;
   toggleLike: (song: Song) => void;
-  setPfp: (pfp: string) => void; //new type for setting profile pictures (pfp is a url to an image in an azure blob)
 };
 
 export const usePlayerStore = create<PlayerState>((set) => ({
@@ -79,22 +86,26 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 export const useUserStore = create<UserStore>()(
   persist(
     (set, get) => ({
-      user_id: -1,
+      user_id: null,
       username: "",
       role: "",
       pfp: "",
       followers: 0,
       following: 0,
+      followingList: [],
       playlistCount: 0,
       isLoggedIn: false,
       likedSongs: [],
       playlists: [],
       streamingHistory: [],
       followedArtists: [],
+      topTracks: [],
 
-      setUser: (user_id, username, role, pfp = "") =>
-        set({ user_id, username, role, isLoggedIn: true, pfp }),
-
+      // Setters
+      setUser: (username, role, pfp = "", user_id = null) =>
+        set({ username, role, pfp, user_id, isLoggedIn: true }),
+      setuser_id: (id) => set({ user_id: id }),
+      setPfp: (pfp) => set({ pfp }),
       setLikedSongs: (songs) => set({ likedSongs: songs }),
       setPlaylists: (lists) => set({ playlists: lists }),
       setStreamingHistory: (songs) => set({ streamingHistory: songs }),
@@ -102,9 +113,11 @@ export const useUserStore = create<UserStore>()(
       setFollowing: (count) => set({ following: count }),
       setPlaylistCount: (count) => set({ playlistCount: count }),
       setFollowedArtists: (artists) => set({ followedArtists: artists }),
+      setFollowingList: (ids) => set({ followingList: ids }),
+      setTopTracks: (songs) => set({ topTracks: songs }),
 
-      logout: () => {
-        usePlayerStore.getState().reset();
+      // Logout method
+      logout: () =>
         set({
           user_id: -1,
           username: "",
@@ -112,16 +125,17 @@ export const useUserStore = create<UserStore>()(
           pfp: "",
           followers: 0,
           following: 0,
+          followingList: [],
           playlistCount: 0,
           isLoggedIn: false,
           likedSongs: [],
           playlists: [],
           streamingHistory: [],
           followedArtists: [],
-        });
-      },
-        setPfp: (pfp) => set({ pfp }), //action to only update user profile picture
+          topTracks: [],
+        }),
 
+      // Toggle like/unlike a song
       toggleLike: (song) => {
         const { likedSongs } = get();
         const isLiked = likedSongs.some((s) => s.song_id === song.song_id);

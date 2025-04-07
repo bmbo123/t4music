@@ -16,7 +16,7 @@ export default function ArtistsFollowing() {
   if (!followedArtists || followedArtists.length === 0) {
     return (
       <div className="mt-10 w-full max-w-4xl">
-        <h3 className="text-3xl font-semibold mb-5">Artists Following</h3>
+        <h3 className="text-2xl font-semibold mb-5">Artists Following</h3>
         <p className="text-gray-400 italic">Oops! You are not following any artists yet.</p>
       </div>
     );

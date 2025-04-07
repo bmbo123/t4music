@@ -84,7 +84,7 @@ export default function AddSongModal({
                 <p className="font-semibold text-white text-lg">{song.title}</p>
                 <p className="text-sm text-gray-400">{song.genre}</p>
               </div>
-              <button className="bg-green-500 hover:bg-green-600 text-black font-bold px-4 py-1 rounded-full text-sm shadow">
+              <button className="bg-gradient-to-r from-pink-300 via-blue-300 to-purple-300 hover:bg-gradient-to-l from-pink-600 via-blue-600 to-purple-600 text-black font-bold px-4 py-1 rounded-full text-sm shadow">
                 Add
               </button>
             </li>

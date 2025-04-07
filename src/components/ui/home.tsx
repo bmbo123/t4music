@@ -1,8 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import NavBar from "@/components/ui/NavBar";
 import Sidebar from "@/components/ui/Sidebar";
-import { useState, useEffect, useCallback, useRef } from "react";
 import { FiPlayCircle, FiPauseCircle, FiSearch } from "react-icons/fi";
 import { useUserStore, usePlayerStore } from "@/store/useUserStore";
 import PlayBar from "@/components/ui/playBar";
@@ -22,7 +22,6 @@ const ListenerHome = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [loading, setLoading] = useState(true);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -32,6 +31,31 @@ const ListenerHome = () => {
 
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [selectedSongForPlaylist, setSelectedSongForPlaylist] = useState<Song | null>(null);
+
+  const {
+    currentSong,
+    isPlaying,
+    playSong,
+    progress,
+    handleSeek,
+  } = useAudioPlayer();
+
+  useEffect(() => {
+    async function fetchUserData() {
+      const res = await fetch("/api/user/profile", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      const store = useUserStore.getState();
+      store.setUser(data.username, data.role, data.pfp, data.user_id);
+      store.setLikedSongs(data.likedSongs);
+      store.setPlaylists(data.playlists);
+      store.setStreamingHistory(data.streamingHistory);
+      store.setTopTracks(data.topTracks);
+      store.setFollowers(data.followers);
+      store.setFollowing(data.following);
+    }
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     setHasMounted(true);
@@ -66,7 +90,7 @@ const ListenerHome = () => {
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     const search = searchParams.get("search");
@@ -83,7 +107,7 @@ const ListenerHome = () => {
       handleSearch(searchQuery);
     }, 300);
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, handleSearch]);
+  }, [searchQuery]);
 
   const audioPlayer = useCallback(
     async (song: Song) => {
@@ -236,6 +260,7 @@ const ListenerHome = () => {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ username, songId: song.song_id }),
+                    body: JSON.stringify({ username, songId: song.song_id }),
                   });
                 } catch (err) {
                   console.error("Failed to sync like:", err);
@@ -286,12 +311,22 @@ const ListenerHome = () => {
             <button
               className="w-full mt-2 py-2 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 rounded text-white font-medium"
               onClick={() => router.push("/listener/my-playlists?create=true")}
+              onClick={() => router.push("/listener/my-playlists?create=true")}
             >
               + Create New Playlist
             </button>
           </div>
         </div>
       )}
+
+      {/* PlayBar (global player) */}
+      <PlayBar
+        currentSong={currentSong}
+        isPlaying={isPlaying}
+        progress={progress}
+        onPlayPause={() => currentSong && playSong(currentSong)}
+        onSeek={handleSeek}
+      />
     </div>
   );
 };

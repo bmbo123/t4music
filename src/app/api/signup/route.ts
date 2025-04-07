@@ -6,10 +6,9 @@ interface users {user_id: number; username: string; role: string;};
 
 export async function POST(request: Request) {
   try {
-    const { username, email, password, role } = await request.json();
+    const { username, email, password,role } = await request.json();
 
-    console.log("📥 Signup received:", { username, email, role });
-
+    // Check if required fields are filled in
     if (!username || !password) {
       return NextResponse.json(
         { error: "Username and password are required" },
@@ -17,6 +16,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check if user alr. exists (by username)
     const existingUser = await prisma.$queryRaw<{ count: number }[]>`
       SELECT COUNT(*) as count FROM users WHERE username = ${username}
     `;
@@ -28,11 +28,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Insert new user into DB
     await prisma.$executeRaw`
-      INSERT INTO users (username, email, password_hash, role)
-      VALUES (${username}, ${email || `${username}@example.com`}, ${hashedPassword}, ${role})
+      INSERT INTO users (username, email, password_hash, role) 
+      VALUES (${username}, ${
+      email || `${username}@example.com`
+    }, ${hashedPassword}, ${role})
     `;
 
     const user: users[] = await prisma.$queryRawUnsafe(`
@@ -44,11 +48,14 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { user_id: user[0].user_id, username: user[0].username, role: user[0].role },
+      { message: "User registered successfully" },
       { status: 201 }
     );
   } catch (error) {
-    console.error("❌ Signup Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("Signup Error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

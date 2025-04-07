@@ -48,7 +48,7 @@ export default function CreatePlaylistModal({
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-green-500 hover:bg-green-600 text-black font-bold px-5 py-2 rounded-xl shadow transition-transform hover:scale-105"
+            className="bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 hover:bg-pink-600 text-black font-bold px-5 py-2 rounded-xl shadow transition-transform hover:scale-105"
           >
             Create
           </button>
