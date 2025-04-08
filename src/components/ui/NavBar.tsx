@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { FaHome, FaSearch, FaBell, FaUserCircle } from "react-icons/fa";
 import { useUserStore } from "@/store/useUserStore";
 
@@ -24,6 +24,8 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
   const username = useUserStore((state) => state.username); // not too sure if this is right cries
 
   function logout() {
+    const store = useUserStore.getState();
+    store.logout();
     localStorage.removeItem('user');
     sessionStorage.removeItem('user');
     router.push("/login");
@@ -118,32 +120,32 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
         {/* Right - Notifications & Menu */}
         <div className="flex items-center space-x-4">
           <Menu as="div" className="relative">
-            <Menu.Button className="hover:text-gray-300">
+            <MenuButton className="hover:text-gray-300">
               <FaBell size={20} />
-            </Menu.Button>
-            <Menu.Items className="absolute right-0 mt-2 w-72 bg-gray-800 rounded-md shadow-xl ring-1 ring-black ring-opacity-5">
+            </MenuButton>
+            <MenuItems className="absolute right-0 mt-2 z-50 w-72 bg-gray-800 rounded-md shadow-xl ring-1 ring-black ring-opacity-5">
               <div className="py-2">
                 {notifications.length === 0 ? (
                   <div className="text-gray-400 px-4 py-2 text-sm">No notifications</div>
                 ) : (
                   notifications.map((n) => (
-                    <Menu.Item key={n.id}>
+                    <MenuItem key={n.id}>
                       <div className="px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">
                         {n.message}
                       </div>
-                    </Menu.Item>
+                    </MenuItem>
                   ))
                 )}
               </div>
-            </Menu.Items>
+            </MenuItems>
           </Menu>
 
           {/* Profile Menu */}
           <Menu as="div" className="relative">
-            <Menu.Button>
+            <MenuButton>
               <FaUserCircle size={24} className="hover:text-gray-300" />
-            </Menu.Button>
-            <Menu.Items className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-md shadow-xl ring-1 ring-black ring-opacity-5">
+            </MenuButton>
+            <MenuItems className="absolute right-0 z-50 mt-2 w-56 bg-gray-800 rounded-md shadow-xl ring-1 ring-black ring-opacity-5">
               <div className="py-1">
                 <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-700">
                   Logged in as{" "}
@@ -152,24 +154,24 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
                   </span>
                 </div>
 
-                <Menu.Item>
+                <MenuItem>
                   <Link
                     href={role === "artist" ? "/profile/artist" : "/profile/user"}
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
                   >
                     Profile
                   </Link>
-                </Menu.Item>
+                </MenuItem>
 
-                <Menu.Item>
+                <MenuItem>
                   <Link
                     href="/settings"
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
                   >
                     Settings
                   </Link>
-                </Menu.Item>
-                <Menu.Item>
+                </MenuItem>
+                <MenuItem>
                   <button
                     onClick={() => {
                       logout();
@@ -178,9 +180,9 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
                   >
                     Logout
                   </button>
-                </Menu.Item>
+                </MenuItem>
               </div>
-            </Menu.Items>
+            </MenuItems>
           </Menu>
         </div>
       </div>
