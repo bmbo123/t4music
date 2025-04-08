@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import NavBar from "@/components/ui/NavBar";
 import Sidebar from "@/components/ui/Sidebar";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { FiPlayCircle, FiPauseCircle, FiSearch } from "react-icons/fi";
-import { useUserStore } from "@/store/useUserStore";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Song } from "../../../types";
-import { useAudioPlayer } from "@/context/AudioContext";
+import { useUserStore, usePlayerStore } from "@/store/useUserStore";
 import PlayBar from "@/components/ui/playBar";
+import { getPlaybackURL } from "@/app/api/misc/actions";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Song } from "../../../types";
 
 const ListenerHome = () => {
   const router = useRouter();
   const { username, toggleLike, likedSongs, playlists } = useUserStore();
+  const { setSong, currentSong, isPlaying } = usePlayerStore();
   const searchParams = useSearchParams();
 
   const [songs, setSongs] = useState<Song[]>([]);
@@ -21,6 +22,7 @@ const ListenerHome = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -31,37 +33,11 @@ const ListenerHome = () => {
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [selectedSongForPlaylist, setSelectedSongForPlaylist] = useState<Song | null>(null);
 
-  const {
-    currentSong,
-    isPlaying,
-    playSong,
-    progress,
-    handleSeek,
-  } = useAudioPlayer();
-
-  useEffect(() => {
-    async function fetchUserData() {
-      const res = await fetch("/api/user/profile", { cache: "no-store" });
-      if (!res.ok) return;
-      const data = await res.json();
-      const store = useUserStore.getState();
-      store.setUser(data.username, data.role, data.pfp, data.user_id);
-      store.setLikedSongs(data.likedSongs);
-      store.setPlaylists(data.playlists);
-      store.setStreamingHistory(data.streamingHistory);
-      store.setTopTracks(data.topTracks);
-      store.setFollowers(data.followers);
-      store.setFollowing(data.following);
-    }
-    fetchUserData();
-  }, []);
-
   useEffect(() => {
     setHasMounted(true);
     const fetchData = async () => {
       try {
         const response = await fetch("/api/songs");
-        if (!response.ok) throw new Error("Failed to fetch songs");
         const data: Song[] = await response.json();
         setSongs(data);
       } catch (error) {
@@ -73,15 +49,7 @@ const ListenerHome = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const search = searchParams.get("search");
-    if (search) {
-      setSearchQuery(search);
-      handleSearch(search);
-    }
-  }, [searchParams]);
-
-  const handleSearch = async (query: string) => {
+  const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
       setIsSearching(false);
@@ -91,7 +59,6 @@ const ListenerHome = () => {
     setIsSearching(true);
     try {
       const response = await fetch(`/api/songs/search?q=${encodeURIComponent(query)}`);
-      if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
       setSearchResults(data.songs);
     } catch (error) {
@@ -99,59 +66,113 @@ const ListenerHome = () => {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const search = searchParams.get("search");
+    if (search) {
+      setSearchQuery(search);
+      handleSearch(search);
+    }
+  }, [searchParams, handleSearch]);
+
+
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleSearch(searchQuery);
     }, 300);
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [searchQuery, handleSearch]);
 
-  const SongGallerySection = ({ title, items }: { title: string; items: Song[] }) => (
-    <section className="w-full max-w-7xl">
-      <h2 className="text-xl font-bold text-white mt-8 mb-3">{title}</h2>
-      <div className="grid grid-cols-5 gap-4">
-        {items.map((song) => {
-          const album_art = song.album?.album_art || "";
-          const isSongCurrentlyPlaying = currentSong?.song_id === song.song_id && isPlaying;
+  const audioPlayer = useCallback(
+    async (song: Song) => {
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+        audioRef.current.addEventListener("timeupdate", () => {
+          const { duration, currentTime } = audioRef.current!;
+          if (!isNaN(duration)) {
+            const progress = (currentTime / duration) * 100;
+            usePlayerStore.getState().setProgress(progress);
+          }
+        });
+      }
 
-          return (
-            <div
-              key={song.song_id}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setContextMenu({ x: e.clientX, y: e.clientY, song });
-              }}
-              onClick={() => playSong(song)}
-              className="group relative rounded-lg overflow-hidden shadow-md no-flicker"
-              style={{
-                backgroundImage: `url(${album_art})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                width: "60%",
-                paddingTop: "60%",
-              }}
-            >
-              <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out flex items-center justify-center">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    playSong(song);
-                  }}
-                  className="text-5xl text-white transition-transform duration-100 hover:scale-105"
-                >
-                  {isSongCurrentlyPlaying ? <FiPauseCircle /> : <FiPlayCircle />}
-                </button>
+      if (currentSong?.song_id === song.song_id) {
+        if (audioRef.current.paused) {
+          await audioRef.current.play();
+          usePlayerStore.getState().togglePlay();
+        } else {
+          audioRef.current.pause();
+          usePlayerStore.getState().togglePlay();
+        }
+        return;
+      }
+
+      audioRef.current.pause();
+
+      const urlResult = await getPlaybackURL(song.file_path);
+      if ("failure" in urlResult) {
+        console.error("Playback URL error:", urlResult.failure);
+        return;
+      }
+
+      audioRef.current.src = urlResult.success.url;
+      audioRef.current.currentTime = 0;
+      setSong(song);
+      usePlayerStore.getState().setProgress(0);
+      audioRef.current.play().catch((error) => console.error("Playback failed:", error));
+    },
+    [currentSong, setSong]
+  );
+
+  const SongGallerySection = useCallback(
+    ({ title, items }: { title: string; items: Song[] }) => (
+      <section className="w-full max-w-7xl">
+        <h2 className="text-xl font-bold text-white mt-8 mb-3">{title}</h2>
+        <div className="grid grid-cols-5 gap-4">
+          {items.map((song) => {
+            const album_art = song.album?.album_art || "";
+            const isSongCurrentlyPlaying = currentSong?.song_id === song.song_id && isPlaying;
+
+            return (
+              <div
+                key={song.song_id}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setContextMenu({ x: e.clientX, y: e.clientY, song });
+                }}
+                onClick={() => audioPlayer(song)}
+                className="group relative rounded-lg overflow-hidden shadow-md no-flicker"
+                style={{
+                  backgroundImage: `url(${album_art})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  width: "60%",
+                  paddingTop: "60%",
+                }}
+              >
+                <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      audioPlayer(song);
+                    }}
+                    className="text-5xl text-white hover:scale-105 transition-transform"
+                  >
+                    {isSongCurrentlyPlaying ? <FiPauseCircle /> : <FiPlayCircle />}
+                  </button>
+                </div>
+                <div className="absolute bottom-0 w-full bg-black bg-opacity-50 px-2 py-1">
+                  <h3 className="text-white text-sm font-semibold truncate">{song.title}</h3>
+                </div>
               </div>
-              <div className="absolute bottom-0 w-full bg-black bg-opacity-50 px-2 py-1">
-                <h3 className="text-white text-sm font-semibold truncate">{song.title}</h3>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
+            );
+          })}
+        </div>
+      </section>
+    ),
+    [currentSong, isPlaying, audioPlayer]
   );
 
   if (!hasMounted || loading) {
@@ -166,19 +187,17 @@ const ListenerHome = () => {
     <div className="flex min-h-screen bg-black text-white">
       <Sidebar username={username} />
       <div className="flex flex-col flex-1 min-w-0">
-        <NavBar role="listener" />
+        <NavBar />
         <main className="p-6 overflow-auto">
           <div className="relative mb-8">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search songs, artists, or genres..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <FiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            </div>
+            <input
+              type="text"
+              placeholder="Search songs, artists, or genres..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <FiSearch className="absolute right-5 top-[56px] transform -translate-y-1/2 text-gray-400" />
           </div>
 
           {isSearching ? (
@@ -197,6 +216,8 @@ const ListenerHome = () => {
           )}
         </main>
       </div>
+
+      <PlayBar />
 
       {contextMenu && (
         <div
@@ -217,7 +238,7 @@ const ListenerHome = () => {
                     body: JSON.stringify({ username, songId: song.song_id }),
                   });
                 } catch (err) {
-                  console.error("Failed to sync like to DB:", err);
+                  console.error("Failed to sync like:", err);
                 }
                 setContextMenu(null);
               }}
@@ -271,15 +292,6 @@ const ListenerHome = () => {
           </div>
         </div>
       )}
-
-      {/* PlayBar (global player) */}
-      <PlayBar
-        currentSong={currentSong}
-        isPlaying={isPlaying}
-        progress={progress}
-        onPlayPause={() => currentSong && playSong(currentSong)}
-        onSeek={handleSeek}
-      />
     </div>
   );
 };

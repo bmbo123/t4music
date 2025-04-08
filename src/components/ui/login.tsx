@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
 
 export default function Login() {
-  const { userId, role } = useUserStore();
+  const { user_id, role } = useUserStore();
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,13 +13,13 @@ export default function Login() {
 
   
   useEffect(() => {
-    if (userId) {
+    if (user_id) {
       if (role === "listener") router.push("/home");
       else if (role === "artist") router.push("/profile/artist");
       else if (role === "admin") router.push("/reportadmin");
       else router.push("/home");
     }
-  }, [userId, role, router]);
+  }, [user_id, role, router]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

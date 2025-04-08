@@ -46,6 +46,9 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
       setFollowers((prev) => prev - 1);
     }
   };
+  if (!artist || !artist.username) {
+    return <div>Artist data is missing or unavailable.</div>;
+  }
 
   return (
     <div className="relative w-full h-80 overflow-hidden bg-black">

@@ -32,7 +32,7 @@ export default function UserPlaylists() {
     if(user_id !== null){
       const newPlaylist = await createPlaylist(name, user_id, playlist_art);
     setPlaylists([...playlists, newPlaylist]);
-    }
+    } 
   };
 
   const handleDelete = async (playlistId: number) => {
@@ -88,7 +88,7 @@ export default function UserPlaylists() {
         {/* ➕ Add Button */}
         <button onClick={() => setShowModal(true)}>
           <div className="min-w-[180px] bg-gray-900 rounded-xl shadow-xl hover:scale-105 transition-transform duration-300 cursor-pointer flex flex-col items-center justify-center py-4">
-            <div className="h-36 w-36 bg-gradient-to-b from-purple-500 via-pink-500 to-blue-400 animate-gradient rounded-xl flex items-center justify-center">
+            <div className="h-36 w-36 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center">
               <FaPlus size={48} className="text-white" />
             </div>
             <p className="text-center py-3 font-semibold">Add Playlist</p>

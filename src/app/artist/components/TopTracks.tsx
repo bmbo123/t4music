@@ -7,6 +7,10 @@ import type { Song } from "@/store/useUserStore";
 export default function TopTracks({ tracks }: { tracks: Song[] }) {
   const { currentSong, isPlaying, setSong, togglePlay } = usePlayerStore();
 
+  if (!tracks || !Array.isArray(tracks)) {
+    return <div>No tracks available</div>; // Render a fallback message if tracks is invalid
+  }
+
   const handlePlay = (track: Song) => {
     const isCurrent = currentSong?.song_id === track.song_id;
     if (isCurrent) {

@@ -9,6 +9,9 @@ interface Album {
 }
 
 export default function ArtistAlbums({ albums }: { albums: Album[] }) {
+  if (!albums || !Array.isArray(albums)) {
+    return <div>No albums available</div>; // Return a fallback UI
+  }
   return (
     <div className="mt-6 w-full max-w-4xl">
       <h3 className="text-3xl font-semibold mb-5">Albums by Artist</h3>

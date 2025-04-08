@@ -8,7 +8,6 @@ import { FaHome, FaSearch, FaBell, FaUserCircle } from "react-icons/fa";
 import { useUserStore } from "@/store/useUserStore";
 
 
-
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -24,6 +23,11 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const username = useUserStore((state) => state.username); // not too sure if this is right cries
 
+  function logout() {
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
+    router.push("/login");
+  }
 
    useEffect(() => {
     const delayDebounce = setTimeout(async () => {
@@ -70,9 +74,6 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
     { id: 3, message: "New artist trending near you" },
   ];
 
-  function logout() {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <nav className="bg-black text-white px-5 py-2 shadow-md">
@@ -172,7 +173,6 @@ export default function NavBar({ role = "listener" }: NavBarProps) {
                   <button
                     onClick={() => {
                       logout();
-                      router.push("/");
                     }}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
                   >

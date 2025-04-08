@@ -9,6 +9,7 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
   const [hasMounted, setHasMounted] = useState(false);
   // const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const { currentSong, isPlaying, progress, playSong, audioRef } = useAudioPlayer();
+  console.log(isPlaying, progress, playSong);// you can delete after use
 
   useEffect(() => {
     setHasMounted(true);
@@ -21,19 +22,7 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
       {hasMounted && currentSong && (
         <>
           <audio ref={audioRef} autoPlay hidden src={audioRef.current?.src} />
-          <PlayBar
-            currentSong={currentSong}
-            isPlaying={isPlaying}
-            progress={progress}
-            onPlayPause={() => currentSong && playSong(currentSong)}
-            onSeek={(e) => {
-              if (!audioRef.current) return;
-              const bar = e.currentTarget;
-              const percent =
-                (e.clientX - bar.getBoundingClientRect().left) / bar.clientWidth;
-              audioRef.current.currentTime = percent * audioRef.current.duration;
-            }}
-          />
+          <PlayBar/>
         </>
       )}
     </div>

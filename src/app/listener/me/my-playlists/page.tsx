@@ -10,13 +10,14 @@ import PlayBar from "@/components/ui/playBar"; // Import PlayBar component
 export default function MyPlaylistsPage() {
   const { playlists, username } = useUserStore();
   const { currentSong, isPlaying, progress, playSong } = useAudioPlayer(); // Use global audio player state
+  console.log(isPlaying, progress, currentSong, playSong);// you can delete after use
 
   return (
     <div className="flex min-h-screen bg-black text-white">
       <Sidebar username={username} />
 
       <div className="flex flex-col flex-1 min-w-0">
-        <NavBar />
+        <NavBar role="listener" />
 
         <main className="p-6 overflow-auto">
           <div className="bg-gradient-to-br from-pink-500 via-blue-400 to-purple-600 p-6 rounded-lg shadow-md mb-8">
@@ -49,19 +50,7 @@ export default function MyPlaylistsPage() {
       </div>
 
       {/* PlayBar Component */}
-      <PlayBar
-        currentSong={currentSong}
-        isPlaying={isPlaying}
-        progress={progress}
-        onPlayPause={() => currentSong && playSong(currentSong)}
-        onSeek={(e) => {
-          if (!currentSong) return;
-          const bar = e.currentTarget;
-          const percent = (e.clientX - bar.getBoundingClientRect().left) / bar.clientWidth;
-          const currentTime = percent * currentSong.duration; 
-          playSong(currentSong); // This will trigger the song change, if needed
-        }}
-      />
+      <PlayBar />
     </div>
   );
 }

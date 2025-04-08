@@ -10,6 +10,7 @@ import PlayBar from "@/components/ui/playBar";
 export default function LikedSongsPage() {
   const { likedSongs, username, role } = useUserStore();
   const { currentSong, isPlaying, progress, playSong } = useAudioPlayer();
+  console.log(isPlaying, progress);// you can delete after use
 
   return (
     <div className="flex min-h-screen bg-black text-white">
@@ -68,19 +69,7 @@ export default function LikedSongsPage() {
       </div>
 
       {/* Global PlayBar */}
-      <PlayBar
-        currentSong={currentSong}
-        isPlaying={isPlaying}
-        progress={progress}
-        onPlayPause={() => currentSong && playSong(currentSong)}
-        onSeek={(e) => {
-          if (!currentSong) return;
-          const bar = e.currentTarget;
-          const percent = (e.clientX - bar.getBoundingClientRect().left) / bar.clientWidth;
-          const currentTime = percent * currentSong.duration;
-          playSong(currentSong); // you might want to call a seek function if you build one
-        }}
-      />
+      <PlayBar/>
     </div>
   );
 }
