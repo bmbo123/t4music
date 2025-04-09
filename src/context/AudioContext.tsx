@@ -61,7 +61,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        user_id: store.user_id,
+        userId: store.userId,
         songId: song.song_id,
         artistId: song.user_id,
       }),

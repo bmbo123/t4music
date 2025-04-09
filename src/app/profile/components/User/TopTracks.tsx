@@ -7,7 +7,7 @@ import { Song } from "@/types";
 
 export default function TopTracks() {
   const { topTracks } = useUserStore();
-  // const { currentSong, isPlaying, playSong, togglePlayPause } = useAudioPlayer();
+  // const { currentSong, isPlaying, playSong, pauseSong } = useAudioPlayer();
   const { currentSong, isPlaying, playSong, togglePlayPause, audioRef } = useAudioPlayer();
 
   if (!topTracks || topTracks.length === 0) {
@@ -18,7 +18,7 @@ export default function TopTracks() {
     );
   }
 
-  const handlePlayClick = (track: Song) => {
+  const handlePlayClick = (track: any) => {
     if (currentSong?.song_id === track.song_id && isPlaying) {
       togglePlayPause();
     } else {

@@ -10,14 +10,13 @@ import PlayBar from "@/components/ui/playBar";
 export default function LikedSongsPage() {
   const { likedSongs, username, role } = useUserStore();
   const { currentSong, isPlaying, progress, playSong } = useAudioPlayer();
-  console.log(role)// feel free to delete
 
   return (
     <div className="flex min-h-screen bg-black text-white">
       <Sidebar  />
 
       <div className="flex flex-col flex-1 min-w-0">
-        <NavBar />
+        <NavBar role={(role || "listener") as "listener" | "artist" | "admin"} />
 
         <main className="p-6 overflow-auto">
           <div className="bg-gradient-to-br from-pink-500 via-blue-400 to-purple-600 p-6 rounded-lg shadow-md mb-8">
@@ -79,7 +78,6 @@ export default function LikedSongsPage() {
           const bar = e.currentTarget;
           const percent = (e.clientX - bar.getBoundingClientRect().left) / bar.clientWidth;
           const currentTime = percent * currentSong.duration;
-          console.log(currentTime)// feel free to delete later
           playSong(currentSong); // you might want to call a seek function if you build one
         }}
       />
