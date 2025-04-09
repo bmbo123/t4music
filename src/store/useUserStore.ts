@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Song as song2 } from "C:/Music/t4music/types";
+import { Song as song2 } from "@/types";
 
 export type Song = {
   song_id: number;
