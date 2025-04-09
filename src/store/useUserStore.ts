@@ -1,24 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Song as song2 } from "@/types";
+import { Song } from "@/types";
 
-export type Song = {
-  song_id: number;
-  title: string;
-  genre?: string;
-  file_path: string;
-  liked_at?: string;
-  played_at?: string;
-  user_id?: number;
-  users?: {
-    username: string;
-    pfp?: string;
-  };
-  album?: {
-    title?: string;
-    album_art?: string;
-  };
-};
 type PlayerState = {
   currentSong: Song | null;
   isPlaying: boolean;

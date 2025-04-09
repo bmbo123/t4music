@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { usePlayerStore } from "@/store/useUserStore";
-import type { Song } from "@/store/useUserStore";
+import type { Song } from "@/types"; // Adjust the import to match the correct type definition
 
 export default function TopTracks({ tracks }: { tracks: Song[] }) {
   const { currentSong, isPlaying, setSong, togglePlay } = usePlayerStore();

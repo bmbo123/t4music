@@ -25,6 +25,13 @@ export async function GET(req: Request) {
                 title: true,
                 duration: true,
                 file_path: true,
+                file_format: true,
+                user_id: true,    
+                users: {
+                  select: {
+                    username: true,
+                  },
+                },
               },
             },
           },

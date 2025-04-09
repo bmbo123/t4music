@@ -16,10 +16,10 @@ export interface User {
 }
 
 export interface Album {
-  Album_id: number;
+  Album_id?: number;
   album_art?: string;
   title: string;
-  user_id: number;
+  user_id?: number;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -31,15 +31,15 @@ export interface Song {
   genre?: string;
   duration: number;
   file_path: string;
-  file_format: string;
+  file_format?: string;
   uploaded_at?: Date;
   plays_count?: number;
-  user_id: number;
+  user_id?: number;
   URL?: string;
+  liked_at?: string;
+  played_at?: string;
   album?: Album;
-  users?:{
-    username: string;
-  };
+  users?: Partial<User>; //ensures types and useUserStore are synced
 }
 
 export interface Playlist {

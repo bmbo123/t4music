@@ -4,16 +4,15 @@ import NavBar from "@/components/ui/NavBar";
 import Sidebar from "@/components/ui/Sidebar";
 import { useUserStore } from "@/store/useUserStore";
 import { useAudioPlayer } from "@/context/AudioContext";
-import { Song } from "@/types";
 import PlayBar from "@/components/ui/playBar";
 
 export default function LikedSongsPage() {
   const { likedSongs, username, role } = useUserStore();
-  const { currentSong, isPlaying, progress, playSong } = useAudioPlayer();
+  const { currentSong, isPlaying, progress, playSong, togglePlayPause, handleSeek } = useAudioPlayer();
 
   return (
     <div className="flex min-h-screen bg-black text-white">
-      <Sidebar  />
+      <Sidebar />
 
       <div className="flex flex-col flex-1 min-w-0">
         <NavBar role={(role || "listener") as "listener" | "artist" | "admin"} />
@@ -42,10 +41,9 @@ export default function LikedSongsPage() {
                       <span className="text-gray-400 w-6 text-right">{index + 1}</span>
 
                       <div>
-                        {/* Title is clickable to play */}
                         <p
                           className="font-semibold text-white cursor-pointer hover:underline"
-                          onClick={() => playSong(song as Song)}
+                          onClick={() => playSong(song)}
                         >
                           {song.title}
                         </p>
@@ -67,19 +65,12 @@ export default function LikedSongsPage() {
         </main>
       </div>
 
-      {/* Global PlayBar */}
       <PlayBar
         currentSong={currentSong}
         isPlaying={isPlaying}
         progress={progress}
-        onPlayPause={() => currentSong && playSong(currentSong)}
-        onSeek={(e) => {
-          if (!currentSong) return;
-          const bar = e.currentTarget;
-          const percent = (e.clientX - bar.getBoundingClientRect().left) / bar.clientWidth;
-          const currentTime = percent * currentSong.duration;
-          playSong(currentSong); // you might want to call a seek function if you build one
-        }}
+        onPlayPause={togglePlayPause}
+        onSeek={(newProgress) => handleSeek(newProgress)}
       />
     </div>
   );

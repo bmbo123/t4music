@@ -18,7 +18,7 @@ export default function TopTracks() {
     );
   }
 
-  const handlePlayClick = (track: any) => {
+  const handlePlayClick = (track: Song) => {
     if (currentSong?.song_id === track.song_id && isPlaying) {
       togglePlayPause();
     } else {

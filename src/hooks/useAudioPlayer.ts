@@ -60,7 +60,7 @@ export function useAudioPlayer() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: useUserStore.getState().userId,
+        userId: useUserStore.getState().user_id,
         songId: song.song_id,
         artistId: song.user_id,
       }),

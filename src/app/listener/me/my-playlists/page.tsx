@@ -9,7 +9,7 @@ import PlayBar from "@/components/ui/playBar"; // Import PlayBar component
 
 export default function MyPlaylistsPage() {
   const { playlists, username } = useUserStore();
-  const { currentSong, isPlaying, progress, playSong } = useAudioPlayer(); // Use global audio player state
+  const { currentSong, isPlaying, progress, togglePlayPause, handleSeek } = useAudioPlayer(); // Use global audio player state
 
   return (
     <div className="flex min-h-screen bg-black text-white">
@@ -53,14 +53,8 @@ export default function MyPlaylistsPage() {
         currentSong={currentSong}
         isPlaying={isPlaying}
         progress={progress}
-        onPlayPause={() => currentSong && playSong(currentSong)}
-        onSeek={(e) => {
-          if (!currentSong) return;
-          const bar = e.currentTarget;
-          const percent = (e.clientX - bar.getBoundingClientRect().left) / bar.clientWidth;
-          const currentTime = percent * currentSong.duration; 
-          playSong(currentSong); // This will trigger the song change, if needed
-        }}
+        onPlayPause={togglePlayPause}
+        onSeek={(newProgress) => handleSeek(newProgress)}
       />
     </div>
   );

@@ -43,12 +43,19 @@ export default function TopTracks() {
     setSong({
       ...song,
       users: { username },
-      album: song.album || {
-        title: "Single",
-        album_art: "/albumArt/defaultAlbumArt.png",
-      },
+      album: song.album
+        ? {
+            title: song.album.title || "Single",
+            album_art: song.album.album_art || "/albumArt/defaultAlbumArt.png",
+          }
+        : {
+            title: "Single",
+            album_art: "/albumArt/defaultAlbumArt.png",
+          },
     });
   };
+  
+  
 
   const handleDelete = async (song_id: number) => {
     const confirmDelete = confirm("Delete this song?");
