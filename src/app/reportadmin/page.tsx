@@ -12,6 +12,7 @@ import HeaderSelection from '@/app/reportadmin/component/tableheader1';
 import TableSection from '@/app/reportadmin/component/table1';
 import ArtTableSection from '@/app/reportadmin/component/artistTable';
 import NavBar from "@/components/ui/NavBar";
+import NewSignupsTable from "./component/NewSignupsTable";
 
 interface listeners {user_id: number; username: string;}
 interface artists {user_id: number; username: string;}
@@ -428,6 +429,11 @@ const ReportAdminPage = () => {
           <div className="flex flex-row justify-center space-x-10 mt-20">
             <div className="custom-gradient-container3">
               <ArtTableSection />
+            </div>
+          </div>
+          <div className="flex flex-row justify-center space-x-10 mt-12">
+            <div className="custom-gradient-container3">
+              <NewSignupsTable  />
             </div>
           </div>
         </div>
