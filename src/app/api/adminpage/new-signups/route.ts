@@ -13,7 +13,6 @@ export async function POST(req: Request) {
     const { period }     = await req.json()
     const { start, end } = parsePeriod(period)
 
-    // find all listeners created in the window
     const signups = await prisma.users.findMany({
       where: {
         role: 'listener',

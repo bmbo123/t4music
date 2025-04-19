@@ -438,10 +438,10 @@ const ReportAdminPage = () => {
             </div>
           </div>
           <div className="flex flex-row justify-center space-x-10 mt-12">
-          <div className="w-full max-w-2xl">
-            <TopListenersTable />
+            <div className="custom-gradient-container3">
+              <TopListenersTable  />
+            </div>
           </div>
-        </div>
         </div>
       </header>
       <div className="flex space-x-16 justify-center mb-4">
