@@ -13,6 +13,7 @@ import TableSection from '@/app/reportadmin/component/table1';
 import ArtTableSection from '@/app/reportadmin/component/artistTable';
 import NavBar from "@/components/ui/NavBar";
 import NewSignupsTable from "./component/NewSignupsTable";
+import TopListenersTable from "./component/TopListenersTable";
 
 interface listeners {user_id: number; username: string;}
 interface artists {user_id: number; username: string;}
@@ -436,6 +437,11 @@ const ReportAdminPage = () => {
               <NewSignupsTable  />
             </div>
           </div>
+          <div className="flex flex-row justify-center space-x-10 mt-12">
+          <div className="w-full max-w-2xl">
+            <TopListenersTable />
+          </div>
+        </div>
         </div>
       </header>
       <div className="flex space-x-16 justify-center mb-4">

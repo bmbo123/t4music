@@ -13,20 +13,21 @@ export async function POST(req: Request) {
     const { period }     = await req.json()
     const { start, end } = parsePeriod(period)
 
-    // Raw SQL: count plays and sum hours per listener in period
-    const rows = await prisma.$queryRaw<
+    const raw = await prisma.$queryRaw<
       Array<{
-        user_id: number
-        username: string
-        plays: number
+        user_id:       number
+        username:      string
+        email:         string
+        plays:         bigint
         streamingHours: number
       }>
     >`
       SELECT
         u.user_id,
         u.username,
-        COUNT(sp.id)                                AS plays,
-        COALESCE(SUM(s.duration) / 3600.0, 0)        AS streamingHours
+        u.email,
+        COUNT(sp.id)                                 AS plays,
+        COALESCE(SUM(s.duration) / 3600.0, 0)         AS streamingHours
       FROM users u
       LEFT JOIN song_plays sp
         ON sp.user_id = u.user_id
@@ -34,17 +35,25 @@ export async function POST(req: Request) {
       LEFT JOIN songs s
         ON s.song_id = sp.song_id
       WHERE u.role = 'listener'
-      GROUP BY u.user_id, u.username
+      GROUP BY u.user_id, u.username, u.email
       ORDER BY plays DESC
       LIMIT 50;
     `
 
-    return NextResponse.json({ listeners: rows })
+    console.log('raw top‑listener rows:', raw)
+
+    const listeners = raw.map(r => ({
+      user_id:        r.user_id,
+      username:       r.username,
+      email:          r.email,
+      plays:          Number(r.plays),
+      streamingHours: Number(r.streamingHours),
+    }))
+
+    return NextResponse.json({ listeners })
   } catch (e) {
-    console.error('top-listeners error', e)
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    console.error('🛑 top-listeners error', e)
+    const message = e instanceof Error ? e.message : 'Internal Server Error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
