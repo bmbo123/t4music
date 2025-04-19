@@ -10,21 +10,24 @@ function parsePeriod(input: string) {
 
 export async function POST(req: Request) {
   try {
-    const { period }     = await req.json()
+    const { period, role } = await req.json() as {
+      period: string,
+      role?: 'listener' | 'artist' | 'admin'
+    }
     const { start, end } = parsePeriod(period)
 
+    const where = {
+      created_at: { gte: start, lt: end },
+      ...(role ? { role } : {})
+    };
+
     const signups = await prisma.users.findMany({
-      where: {
-        role: 'listener',
-        created_at: {
-          gte: start,
-          lt:  end
-        }
-      },
+      where,
       select: {
         user_id:    true,
         username:   true,
         email:      true,
+        role:       true,    
         created_at: true
       },
       orderBy: { created_at: 'desc' }
